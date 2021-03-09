@@ -4,25 +4,29 @@ const router = express.Router();
 // home page
 router.get('/', (req, res, next)=> {
 
-    let db = req.con;
+    const   {con}   =req;
+    // let db = req.con;
+    // 使用解構賦值,解構裡面的變數就會接資料,不需要另外一個變數
     let data = "";
 
-    let user = "";
-    user = req.query.user;
+   const  {user} = req.query;
+    // user = req.query.user;
     
-    let filter = "";
+    let filter = "";   
     if (user) {
         filter = 'WHERE userid = ?';
     }
 
-    db.query('SELECT * FROM account ' + filter, user, (err, rows)=> {
+    con.query(`SELECT * FROM account ${filter}`,user, (err, rows)=> {
         if (err) {
             console.log(err);
         }
          data = rows;
 
         // use index.ejs
-        res.render('index', { title: 'Account Information', data: data, user: user });
+        //ES5: res.render('index', { title: 'Account Information', data: data, user: user });
+        //物件實字
+        res.render('index', { title: 'Account Information', data, user });
     });
 
 });
@@ -37,17 +41,19 @@ router.get('/add', (req, res, next)=> {
 
 // add post
 router.post('/userAdd', (req, res, next)=> {
+    const {con}=req;
+    // let db = req.con;
 
-    let db = req.con;
-
+    const {userid,password,email}=res.body;
     let sql = {
-        userid: req.body.userid,
-        password: req.body.password,
-        email: req.body.email
+        userid: userid,
+        password:password,
+        email: email
     };
 
     //console.log(sql);
-    let qur = db.query('INSERT INTO account SET ?', sql, (err, rows)=> {
+    //由於const自己就會執行,因此不需要額外再給予另外的值
+    con.query('INSERT INTO account SET ?', sql, (err, rows)=> {
         if (err) {
             console.log(err);
         }
@@ -61,33 +67,38 @@ router.post('/userAdd', (req, res, next)=> {
 // edit page
 router.get('/userEdit', (req, res, next)=> {
 
-    let id = req.query.id;
-    let db = req.con;
+    const {id}=req.query;
+    // let id = req.query.id;
+    const {con}=req;
+    // let db = req.con;
     let data = "";
 
-    db.query('SELECT * FROM account WHERE id = ?', id, (err, rows)=> {
+    con.query('SELECT * FROM account WHERE id = ?', id, (err, rows)=> {
         if (err) {
             console.log(err);
         }
 
          let data = rows;
-        res.render('userEdit', { title: 'Edit Account', data: data });
+        res.render('userEdit', { title: 'Edit Account', data });
     });
 
 });
 
 router.post('/userEdit', (req, res, next)=> {
 
-    let db = req.con;
-    let id = req.body.id;
+    const {con}=req;
+    // let db = req.con;
+    const {id}=req.body;
+    // let id = req.body.id;
 
+    const {userid,password,email}=req.body;
     let sql = {
-        userid: req.body.userid,
-        password: req.body.password,
-        email: req.body.email
+        userid: userid,
+        password: password,
+        email: email
     };
 
-   let qur = db.query('UPDATE account SET ? WHERE id = ?', [sql, id], (err, rows)=> {
+     con.query('UPDATE account SET ? WHERE id = ?', [sql, id], (err, rows)=> {
         if (err) {
             console.log(err);
         }
@@ -100,11 +111,14 @@ router.post('/userEdit', (req, res, next)=> {
 
 
 router.get('/userDelete', (req, res, next)=> {
+   
+    const {id}=req.query;
+    // let id = req.query.id;
 
-    let id = req.query.id;
-    let db = req.con;
+    const {con}=req;
+    // let db = req.con;
 
-    let qur = db.query('DELETE FROM account WHERE id = ?', id, (err, rows)=> {
+    con.query('DELETE FROM account WHERE id = ?', id, (err, rows)=> {
         if (err) {
             console.log(err);
         }
