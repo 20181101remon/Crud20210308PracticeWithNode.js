@@ -8,12 +8,12 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 // DataBase 
 let mysql = require("mysql");
-
+require('dotenv').config();
 let con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "0000",
-    database: "test"
+    host: process.env.HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE
 });
 
 con.connect((err) =>{
